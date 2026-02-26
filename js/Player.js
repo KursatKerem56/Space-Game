@@ -19,6 +19,8 @@ class Player {
     this.maxSpeed = 3;
     this.maxRotationThrust = 0.05;
     this.particleMaxLife = 100;
+    this.frameCountPerParticle = 1; // add a new particle every 1 frame at max speed
+    this.frameCounterForParticles = 0;
     this.thrustVector = { dir: this.angle, power: 0 };
   }
 
@@ -26,6 +28,27 @@ class Player {
     // calculate corners for collision detection
     this.shipCorners = this.calculateCorners();
     this.flameCorners = this.calculateFlameCorners();
+
+    // update fps count per particle based on (speed / maxSpeed)
+    this.frameCountPerParticle = Math.max(
+      1,
+      Math.floor(15 - (this.speed / this.maxSpeed) * 14),
+    );
+
+    if (this.frameCounterForParticles >= this.frameCountPerParticle) {
+      this.frameCounterForParticles = 0;
+
+      // add flame particles based on speed
+      if (this.speed > 0.5) {
+        this.flameParticles.push({
+          x: this.flameCorners[0].x,
+          y: this.flameCorners[0].y,
+          life: this.particleMaxLife,
+          angle: this.angle + Math.PI + (Math.random() - 0.5) * 0.5,
+          speed: Math.random() * (1 + this.speed / this.maxSpeed) + 1,
+        });
+      }
+    }
 
     if (this.rotateLeft && !this.rotateRight) this.rightThrust += 0.001;
     if (this.rotateRight && !this.rotateLeft) this.leftThrust += 0.001;
@@ -63,17 +86,6 @@ class Player {
     this.angle += this.leftThrust;
     this.angle -= this.rightThrust;
 
-    // add flame particles when thrusting
-    if (this.speed > 0.1) {
-      this.flameParticles.push({
-        x: this.flameCorners[0].x,
-        y: this.flameCorners[0].y,
-        life: this.particleMaxLife,
-        angle: this.angle + Math.PI + (Math.random() - 0.5) * 0.5,
-        speed: Math.random() * (1 + this.speed / this.maxSpeed) + 1,
-      });
-    }
-
     // update flame particles
     if (this.flameParticles.length > 0) {
       this.flameParticles.forEach((p) => {
@@ -85,6 +97,8 @@ class Player {
 
     // remove dead particles
     this.flameParticles = this.flameParticles.filter((p) => p.life > 0);
+
+    this.frameCounterForParticles++;
   }
 
   draw(ctx) {
