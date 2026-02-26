@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+</body>
+</html>
+
+<script src="./js/Player.js"></script>
+<script src="./js/Game.js"></script>
+
+<script>
+  new Game(document.getElementById('game-canvas'));
+</script>
