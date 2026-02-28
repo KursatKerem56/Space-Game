@@ -18,10 +18,9 @@ class Player {
     this.rightThrust = 0;
     this.maxSpeed = 3;
     this.maxRotationThrust = 0.05;
-    this.particleMaxLife = 100;
+    this.particleMaxLife = 3000;
     this.frameCountPerParticle = 1; // add a new particle every 1 frame at max speed
     this.frameCounterForParticles = 0;
-    this.thrustVector = { dir: this.angle, power: 0 };
   }
 
   update() {
@@ -60,12 +59,7 @@ class Player {
     this.rightThrust *= 0.98;
 
     const treshold = 0.01;
-    if (this.speed < treshold) {
-      this.speed = 0;
-      this.thrustVector.dir = this.angle;
-    } else if (this.thrust) {
-      this.thrustVector.dir += (this.angle - this.thrustVector.dir) * 0.01;
-    }
+    if (this.speed < treshold) this.speed = 0;
     if (this.leftThrust < treshold / 11) this.leftThrust = 0;
     if (this.rightThrust < treshold / 11) this.rightThrust = 0;
 
@@ -73,12 +67,7 @@ class Player {
     this.leftThrust = Math.min(this.leftThrust, this.maxRotationThrust);
     this.rightThrust = Math.min(this.rightThrust, this.maxRotationThrust);
 
-    // update thrust vector
-    this.thrustVector.power = this.speed;
-
-    // update position based on thrust vector
-    // this.x += Math.cos(this.thrustVector.dir) * this.thrustVector.power;
-    // this.y += Math.sin(this.thrustVector.dir) * this.thrustVector.power;
+    // update position based on speed and angle
     this.x += Math.cos(this.angle) * this.speed;
     this.y += Math.sin(this.angle) * this.speed;
 
@@ -92,6 +81,15 @@ class Player {
         p.x += Math.cos(p.angle) * p.speed;
         p.y += Math.sin(p.angle) * p.speed;
         p.life--;
+
+        if (
+          p.x < 0 ||
+          p.x > this.game.width ||
+          p.y < 0 ||
+          p.y > this.game.height
+        ) {
+          p.life = 0;
+        }
       });
     }
 
@@ -123,18 +121,18 @@ class Player {
     ctx.closePath();
 
     // ship direction line
-    // if (this.thrust) {
-    //   ctx.beginPath();
-    //   ctx.strokeStyle = "orange";
-    //   ctx.lineWidth = 2;
-    //   ctx.moveTo(this.x, this.y);
-    //   ctx.lineTo(
-    //     this.x + Math.cos(this.thrustVector.dir) * this.size * 1.5,
-    //     this.y + Math.sin(this.thrustVector.dir) * this.size * 1.5,
-    //   );
-    //   ctx.stroke();
-    //   ctx.closePath();
-    // }
+    if (this.thrust) {
+      ctx.beginPath();
+      ctx.strokeStyle = "orange";
+      ctx.lineWidth = 2;
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(
+        this.x + Math.cos(this.angle) * this.size * 1.5,
+        this.y + Math.sin(this.angle) * this.size * 1.5,
+      );
+      ctx.stroke();
+      ctx.closePath();
+    }
 
     // thrust flame
     if (this.speed > 0) {
