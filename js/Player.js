@@ -10,7 +10,7 @@ class Player {
     this.shipCorners = this.calculateCorners();
     this.flameCorners = this.calculateFlameCorners();
     this.flameParticles = [];
-    this.flameColorCode = "207, 53, 46";
+    this.flameColorCode = "219, 132, 59";
     this.rotateLeft = false;
     this.rotateRight = false;
     this.thrust = false;
